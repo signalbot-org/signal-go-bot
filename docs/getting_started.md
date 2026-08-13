@@ -13,15 +13,12 @@ To fire it up quickly in Docker:
 ```bash
 docker run -d --name signal-cli-rest-api \
     -p 8080:8080 \
-    -v $(pwd)/signal-data:/home/.local/share/signal-cli \
+	-v "$HOME/.local/share/signal-data:/home/.local/share/signal-cli" \
+	-e MODE=json-rpc \
     bbernhard/signal-cli-rest-api:latest
 ```
 
-Follow their [documentation](https://github.com/bbernhard/signal-cli-rest-api) to register your phone number correctly or link a device.
-
-## 2. Install SignalGoBot
-
-In your Go project, initialize your module and fetch the package:
+_Note: `MODE=json-rpc` is strictly required to enable the WebSocket endpoints this bot library relies on. `normal` mode will fail to connect._
 
 ```bash
 go mod init my-bot
@@ -37,6 +34,7 @@ package main
 
 import (
 	"log"
+
 	"github.com/dmitrii-codes/signalgobot"
 )
 
@@ -48,14 +46,13 @@ func (c *HelloCommand) Handle(ctx *signalgobot.Context) error {
 }
 
 func main() {
-	// Initialize Bot connected to your local signal-cli-rest-api instance
 	config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
 	bot := signalgobot.NewBot(config)
 
-    // Using the built in exact text trigger to listen for "hi"
+	// Use the built-in exact text trigger to listen for "hi".
 	bot.Register(signalgobot.Triggered(&HelloCommand{}, false, "hi"))
 
-    log.Println("Starting Bot...")
+	log.Println("Starting bot...")
 	if err := bot.Start(); err != nil {
 		log.Fatalf("Failed to start bot: %v", err)
 	}
@@ -64,10 +61,46 @@ func main() {
 
 ## 4. Middleware & Triggers
 
-`signalgobot` provides pre-built triggers to handle incoming traffic safely:
+`signalgobot` provides trigger wrappers for commands:
 
-- `Triggered(cmd, caseSensitive bool, variations...)`: Responds to exact text messages.
-- `RegexTriggered(cmd, patterns...)`: Responds to messages matching specific regular expressions.
-- `ReactionTriggered(cmd, emojis...)`: Responds when someone reacts to a message with a specific emoji.
+- `Triggered(cmd, caseSensitive bool, exactMatches ...string)` matches complete message text.
+- `RegexTriggered(cmd, patterns ...*regexp.Regexp)` accepts compiled regular expressions.
+- `ReactionTriggered(cmd, emojis ...string)` matches selected reactions; omit emojis to match any reaction.
 
-All of these can be chained inside `.Register( ... )`.
+Wrap a command and register the result:
+
+```go
+bot.Register(signalgobot.RegexTriggered(
+	&HelloCommand{},
+	regexp.MustCompile(`(?i)^hello[!.]?$`),
+))
+bot.Register(signalgobot.ReactionTriggered(&HelloCommand{}, "👍", "❤️"))
+```
+
+Every registered command is considered for every incoming message. Messages are
+handled concurrently, while commands for one message run in registration order.
+
+## 5. Optional Configuration
+
+Set optional fields before calling `NewBot`:
+
+```go
+config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
+config.Auth = &signalgobot.BasicAuthentication{
+	Username: "user",
+	Password: "password",
+}
+config.DownloadAttachments = false // defaults to true
+
+storage, err := signalgobot.NewSQLiteStorage("bot.db")
+if err != nil {
+	log.Fatal(err)
+}
+config.Storage = storage
+
+bot := signalgobot.NewBot(config)
+```
+
+Bearer authentication is available through `BearerAuthentication`. Redis storage is
+available through `NewRedisStorage`. See the [Context Reference](context.md) for
+storage operations, sending options, and direct API access.

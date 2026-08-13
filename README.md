@@ -12,7 +12,8 @@ This is a structural port of the Python [`signalbot`](https://github.com/signalb
 go get github.com/dmitrii-codes/signalgobot
 ```
 
-**Prerequisites:** You will need an active running instance of `signal-cli-rest-api` that your bot can connect to.
+**Prerequisites:** Go 1.24 or newer and an active, registered instance of
+[`signal-cli-rest-api`](https://github.com/bbernhard/signal-cli-rest-api). **This API container must be running in `json-rpc` mode** to expose the required WebSocket.
 
 ## Quickstart
 
@@ -57,7 +58,8 @@ func main() {
 - **Triggers**: Utilize robust middlewares like `Triggered`, `RegexTriggered`, and `ReactionTriggered`.
 - **Quotations & Mentions**: Support for rich message formatting and exact replies (`ctx.Reply("...")`).
 - **Read Receipts & Typing Indicators**: Easily emulate human-like behavior via commands (`ctx.StartTyping()`, `ctx.MarkRead()`).
-- **Storage Subsystems**: Interfaces mapping directly to `sqlite3` and `redis/v9` for persistent caching configurations out of the box.
+- **Storage Subsystems**: Optional JSON-backed key/value storage using SQLite or Redis.
+- **Attachments**: Download incoming attachments as base64 by default and send base64 attachments with `SendOptions`.
 
 ## Architecture Pattern
 
@@ -82,9 +84,45 @@ func (c *DatabaseCheckCommand) Handle(ctx *signalgobot.Context) error {
 }
 ```
 
+Each incoming message is handled in its own goroutine. For a given message, all
+registered commands run in registration order; trigger wrappers decide whether their
+wrapped command should run.
+
+## Configuration
+
+`NewConfig` requires the `signal-cli-rest-api` address and the registered Signal
+number. The address must be `host:port`, because the library adds the HTTP and
+WebSocket schemes.
+
+```go
+config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
+
+// Optional authentication for a protected signal-cli-rest-api instance.
+config.Auth = &signalgobot.BearerAuthentication{Token: "token"}
+
+// Basic authentication is also supported:
+// config.Auth = &signalgobot.BasicAuthentication{Username: "user", Password: "pass"}
+
+// Optional storage. Context.Storage is nil when no backend is configured.
+storage, err := signalgobot.NewSQLiteStorage("bot.db")
+if err != nil {
+	log.Fatal(err)
+}
+config.Storage = storage
+
+// Incoming attachments are downloaded and base64-encoded by default.
+// You can disable automatic downloads.
+config.DownloadAttachments = false
+```
+
+Redis is available through `NewRedisStorage(host, port, password)`. SQLite uses
+`github.com/mattn/go-sqlite3`, so builds that use it require CGO and a C compiler.
+
 ## Documentation & Examples
 
-For more advanced usage and deeper dives into the context of the bot, check out the [Docs folder](docs/) (e.g., [Getting Started](docs/getting_started.md)).
+See [Getting Started](docs/getting_started.md) for setup and trigger examples, and
+[Context Reference](docs/context.md) for messages, sending options, storage, and the
+lower-level API.
 
 You can also find runnable templates and advanced command examples in the [`examples/`](examples) directory.
 
