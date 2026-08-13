@@ -1,4 +1,4 @@
-package signalgobot
+package signalbot
 
 type Command interface {
 	Handle(ctx *Context) error

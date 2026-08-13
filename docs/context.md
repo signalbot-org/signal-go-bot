@@ -14,7 +14,7 @@ All context actions return an error. `Reply` sends a quote of the incoming messa
 `Send` sends without a quote unless one is supplied in `SendOptions`.
 
 ```go
-func (c *MyCommand) Handle(ctx *signalgobot.Context) error {
+func (c *MyCommand) Handle(ctx *signalbot.Context) error {
 	log.Println("User sent:", ctx.Message.Text)
 
 	if err := ctx.StartTyping(); err != nil {
@@ -44,9 +44,9 @@ is added to `Base64Attachments`.
 Pass `nil` for a plain message or use `SendOptions` for richer messages:
 
 ```go
-return ctx.Send("Updated message", &signalgobot.SendOptions{
+return ctx.Send("Updated message", &signalbot.SendOptions{
 	Base64Attachments: []string{encodedFile},
-	LinkPreview: &signalgobot.LinkPreview{
+	LinkPreview: &signalbot.LinkPreview{
 		URL:         "https://example.com",
 		Title:       "Example",
 		Description: "An example link",
@@ -63,27 +63,27 @@ for quoting the current message.
 ## Storage Interface
 
 Configure storage before constructing the bot. Both built-in backends JSON-encode
-values, so pass a pointer to `Read` and use `errors.Is(err, signalgobot.ErrNotFound)`
+values, so pass a pointer to `Read` and use `errors.Is(err, signalbot.ErrNotFound)`
 to detect a missing key.
 
 ```go
-storage, err := signalgobot.NewSQLiteStorage("bot.db")
+storage, err := signalbot.NewSQLiteStorage("bot.db")
 if err != nil {
 	log.Fatal(err)
 }
 config.Storage = storage
-bot := signalgobot.NewBot(config)
+bot := signalbot.NewBot(config)
 ```
 
 ```go
-func (c *DatabaseCheck) Handle(ctx *signalgobot.Context) error {
+func (c *DatabaseCheck) Handle(ctx *signalbot.Context) error {
 	if ctx.Storage == nil {
 		return errors.New("storage is not configured")
 	}
 
 	var storedName string
 	err := ctx.Storage.Read(context.Background(), ctx.Message.Source, &storedName)
-	if errors.Is(err, signalgobot.ErrNotFound) {
+	if errors.Is(err, signalbot.ErrNotFound) {
 		if err := ctx.Storage.Save(context.Background(), ctx.Message.Source, "New User"); err != nil {
 			return err
 		}

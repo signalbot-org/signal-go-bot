@@ -1,4 +1,4 @@
-package signalgobot
+package signalbot
 
 type SendOptions struct {
 	Base64Attachments []string

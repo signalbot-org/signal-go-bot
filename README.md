@@ -1,6 +1,6 @@
-# SignalGoBot Framework
+# Signal Bot Framework
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/dmitrii-codes/signalgobot.svg)](https://pkg.go.dev/github.com/dmitrii-codes/signalgobot)
+[![Go Reference](https://pkg.go.dev/badge/github.com/dmitrii-codes/signal-go-bot.svg)](https://pkg.go.dev/github.com/dmitrii-codes/signal-go-bot)
 
 A Go module to build your own Signal bots asynchronously and easily.
 
@@ -9,7 +9,7 @@ This is a structural port of the Python [`signalbot`](https://github.com/signalb
 ## Installation
 
 ```bash
-go get github.com/dmitrii-codes/signalgobot
+go get github.com/dmitrii-codes/signal-go-bot
 ```
 
 **Prerequisites:** Go 1.24 or newer and an active, registered instance of
@@ -17,7 +17,7 @@ go get github.com/dmitrii-codes/signalgobot
 
 ## Quickstart
 
-This is what a minimal bot using SignalGoBot looks like:
+This is what a minimal bot using signal-go-bot looks like:
 
 ```go
 package main
@@ -25,24 +25,24 @@ package main
 import (
 	"log"
 
-	"github.com/dmitrii-codes/signalgobot"
+	"github.com/dmitrii-codes/signal-go-bot"
 )
 
 // Define a command
 type PingCommand struct{}
 
-func (c *PingCommand) Handle(ctx *signalgobot.Context) error {
+func (c *PingCommand) Handle(ctx *signalbot.Context) error {
 	log.Println("Received ping command")
 	return ctx.Reply("pong")
 }
 
 func main() {
 	// Initialize Bot connected to your local signal-cli-rest-api instance
-	config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
-	bot := signalgobot.NewBot(config)
+	config := signalbot.NewConfig("127.0.0.1:8080", "+1234567890")
+	bot := signalbot.NewBot(config)
 
 	// Register Command with a case-insensitive trigger
-	bot.Register(signalgobot.Triggered(&PingCommand{}, false, "ping"))
+	bot.Register(signalbot.Triggered(&PingCommand{}, false, "ping"))
 
 	// Start bot loop and WebSocket connection (Blocking)
 	if err := bot.Start(); err != nil {
@@ -78,7 +78,7 @@ type DatabaseCheckCommand struct {
 	DB *sql.DB
 }
 
-func (c *DatabaseCheckCommand) Handle(ctx *signalgobot.Context) error {
+func (c *DatabaseCheckCommand) Handle(ctx *signalbot.Context) error {
 	// Execute custom DB logic
 	return ctx.Send("Checked!", nil)
 }
@@ -95,16 +95,16 @@ number. The address must be `host:port`, because the library adds the HTTP and
 WebSocket schemes.
 
 ```go
-config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
+config := signalbot.NewConfig("127.0.0.1:8080", "+1234567890")
 
 // Optional authentication for a protected signal-cli-rest-api instance.
-config.Auth = &signalgobot.BearerAuthentication{Token: "token"}
+config.Auth = &signalbot.BearerAuthentication{Token: "token"}
 
 // Basic authentication is also supported:
-// config.Auth = &signalgobot.BasicAuthentication{Username: "user", Password: "pass"}
+// config.Auth = &signalbot.BasicAuthentication{Username: "user", Password: "pass"}
 
 // Optional storage. Context.Storage is nil when no backend is configured.
-storage, err := signalgobot.NewSQLiteStorage("bot.db")
+storage, err := signalbot.NewSQLiteStorage("bot.db")
 if err != nil {
 	log.Fatal(err)
 }

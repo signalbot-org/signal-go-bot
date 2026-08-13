@@ -1,4 +1,4 @@
-package signalgobot
+package signalbot
 
 // Helper functions for pointers
 func String(v string) *string { return &v }

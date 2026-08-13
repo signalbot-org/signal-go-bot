@@ -1,6 +1,6 @@
-package signalgobot
+package signalbot
 
-// Config holds all parameters to bootstrap a signalgobot instance
+// Config holds all parameters to bootstrap a signalbot instance
 type Config struct {
 	SignalService       string
 	PhoneNumber         string

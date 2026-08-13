@@ -1,4 +1,4 @@
-module github.com/dmitrii-codes/signalgobot
+module github.com/dmitrii-codes/signal-go-bot
 
 go 1.24.4
 

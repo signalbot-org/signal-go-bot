@@ -1,4 +1,4 @@
-package signalgobot
+package signalbot
 
 import (
 	"regexp"

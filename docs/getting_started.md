@@ -1,8 +1,8 @@
-# Getting Started with SignalGoBot
+# Getting Started with Signal Bot
 
 ## Introduction
 
-SignalGoBot is a concurrent Go framework to build your own Signal bots. It maps over the `signal-cli-rest-api` daemon.
+Signal Bot is a concurrent Go framework to build your own Signal bots. It maps over the `signal-cli-rest-api` daemon.
 
 ## 1. Prerequisites
 
@@ -22,7 +22,7 @@ _Note: `MODE=json-rpc` is strictly required to enable the WebSocket endpoints th
 
 ```bash
 go mod init my-bot
-go get github.com/dmitrii-codes/signalgobot
+go get github.com/dmitrii-codes/signalbot
 ```
 
 ## 3. Write Core Syntax
@@ -35,22 +35,22 @@ package main
 import (
 	"log"
 
-	"github.com/dmitrii-codes/signalgobot"
+	"github.com/dmitrii-codes/signalbot"
 )
 
 type HelloCommand struct{}
 
-func (c *HelloCommand) Handle(ctx *signalgobot.Context) error {
+func (c *HelloCommand) Handle(ctx *signalbot.Context) error {
 	log.Println("Received trigger from", ctx.Message.Source)
 	return ctx.Reply("👋 Hello!")
 }
 
 func main() {
-	config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
-	bot := signalgobot.NewBot(config)
+	config := signalbot.NewConfig("127.0.0.1:8080", "+1234567890")
+	bot := signalbot.NewBot(config)
 
 	// Use the built-in exact text trigger to listen for "hi".
-	bot.Register(signalgobot.Triggered(&HelloCommand{}, false, "hi"))
+	bot.Register(signalbot.Triggered(&HelloCommand{}, false, "hi"))
 
 	log.Println("Starting bot...")
 	if err := bot.Start(); err != nil {
@@ -61,7 +61,7 @@ func main() {
 
 ## 4. Middleware & Triggers
 
-`signalgobot` provides trigger wrappers for commands:
+`signalbot` provides trigger wrappers for commands:
 
 - `Triggered(cmd, caseSensitive bool, exactMatches ...string)` matches complete message text.
 - `RegexTriggered(cmd, patterns ...*regexp.Regexp)` accepts compiled regular expressions.
@@ -70,11 +70,11 @@ func main() {
 Wrap a command and register the result:
 
 ```go
-bot.Register(signalgobot.RegexTriggered(
+bot.Register(signalbot.RegexTriggered(
 	&HelloCommand{},
 	regexp.MustCompile(`(?i)^hello[!.]?$`),
 ))
-bot.Register(signalgobot.ReactionTriggered(&HelloCommand{}, "👍", "❤️"))
+bot.Register(signalbot.ReactionTriggered(&HelloCommand{}, "👍", "❤️"))
 ```
 
 Every registered command is considered for every incoming message. Messages are
@@ -85,20 +85,20 @@ handled concurrently, while commands for one message run in registration order.
 Set optional fields before calling `NewBot`:
 
 ```go
-config := signalgobot.NewConfig("127.0.0.1:8080", "+1234567890")
-config.Auth = &signalgobot.BasicAuthentication{
+config := signalbot.NewConfig("127.0.0.1:8080", "+1234567890")
+config.Auth = &signalbot.BasicAuthentication{
 	Username: "user",
 	Password: "password",
 }
 config.DownloadAttachments = false // defaults to true
 
-storage, err := signalgobot.NewSQLiteStorage("bot.db")
+storage, err := signalbot.NewSQLiteStorage("bot.db")
 if err != nil {
 	log.Fatal(err)
 }
 config.Storage = storage
 
-bot := signalgobot.NewBot(config)
+bot := signalbot.NewBot(config)
 ```
 
 Bearer authentication is available through `BearerAuthentication`. Redis storage is
