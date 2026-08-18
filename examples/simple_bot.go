@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	signalbot "github.com/dmitrii-codes/signal-go-bot"
+	signalbot "github.com/signalbot-org/signal-go-bot"
 )
 
 // PingCommand represents a simple reply command

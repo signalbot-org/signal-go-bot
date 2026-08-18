@@ -22,7 +22,7 @@ _Note: `MODE=json-rpc` is strictly required to enable the WebSocket endpoints th
 
 ```bash
 go mod init my-bot
-go get github.com/dmitrii-codes/signalbot
+go get github.com/signalbot-org/signal-go-bot
 ```
 
 ## 3. Write Core Syntax
@@ -35,7 +35,7 @@ package main
 import (
 	"log"
 
-	"github.com/dmitrii-codes/signalbot"
+	signalbot "github.com/signalbot-org/signal-go-bot"
 )
 
 type HelloCommand struct{}

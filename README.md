@@ -1,6 +1,6 @@
 # Signal Bot Framework
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/dmitrii-codes/signal-go-bot.svg)](https://pkg.go.dev/github.com/dmitrii-codes/signal-go-bot)
+[![Go Reference](https://pkg.go.dev/badge/github.com/signalbot-org/signal-go-bot.svg)](https://pkg.go.dev/github.com/signalbot-org/signal-go-bot)
 
 A Go module to build your own Signal bots asynchronously and easily.
 
@@ -9,7 +9,7 @@ This is a structural port of the Python [`signalbot`](https://github.com/signalb
 ## Installation
 
 ```bash
-go get github.com/dmitrii-codes/signal-go-bot
+go get github.com/signalbot-org/signal-go-bot
 ```
 
 **Prerequisites:** Go 1.24 or newer and an active, registered instance of
@@ -25,10 +25,7 @@ package main
 import (
 	"log"
 
-	"github.com/dmitrii-codes/signal-go-bot"
-)
-
-// Define a command
+    signalbot "github.com/signalbot-org/signal-go-bot"
 type PingCommand struct{}
 
 func (c *PingCommand) Handle(ctx *signalbot.Context) error {
