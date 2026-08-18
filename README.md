@@ -130,9 +130,9 @@ When contributing, please ensure tests pass (`go test ./...`) before submitting.
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+This project is licensed under the **Mozilla Public License 2.0 (MPL-2.0)**.
 
-You are free to use, modify, and distribute this software.  
-However, if you run a modified version as a network service or distribute it, you **must also make the source code available** under the same license.
+You are free to use, modify, and distribute this software, including using it in closed-source projects.
+However, if you modify the framework's source code files and distribute the result, you must make those modifications available under the same license.
 
 See the [LICENSE](LICENSE) file for the full text.
